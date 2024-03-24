@@ -69,13 +69,13 @@ func (r *Rotary) monitor(channel *chan string) {
 			if stateA != stateB {
 				// Knob turned clockwise
 				// Update channel with clockwise rotation event
-				*channel <- "Clockwise"
+				*channel <- "CW"
 			}
 
 			if stateA == stateB {
 				// Knob turned counterclockwise
 				// Update channel with counterclockwise rotation event
-				*channel <- "Counterclockwise"
+				*channel <- "CCW"
 			}
 		}
 	}

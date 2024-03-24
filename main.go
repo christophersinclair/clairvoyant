@@ -55,12 +55,12 @@ func main() {
 				// Black button was pressed
 			}
 		case event := <-rotaryEncoderEventChannel:
-			if event == "Clockwise" {
+			if event == "CW" {
 				// Rotary encoder was turned clockwise
-			} else if event == "Counterclockwise" {
+				display.show(make([]byte, 0))
+			} else if event == "CCW" {
 				// Rotary encoder was turned counterclockwise
 			}
-
 		}
 	}
 }

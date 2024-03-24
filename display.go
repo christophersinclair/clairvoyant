@@ -1,7 +1,6 @@
 package main
 
 import (
-	"image"
 	"log"
 
 	"periph.io/x/conn/v3/i2c/i2creg"
@@ -37,6 +36,6 @@ func initializeDisplay() *Display {
 	return &display
 }
 
-func (d *Display) show(img image.Image) {
-	d.dev.Draw(img.Bounds(), img, image.Point{})
+func (d *Display) show(bytes []byte) {
+	d.dev.Write(bytes)
 }
