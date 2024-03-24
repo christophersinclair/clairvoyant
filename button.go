@@ -43,6 +43,7 @@ func (b *Button) monitor(channel *chan string) {
 		pin.WaitForEdge(time.Second)
 		state := pin.Read()
 
+		// Update channel with pin state
 		*channel <- state.String()
 	}
 }

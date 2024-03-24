@@ -78,6 +78,5 @@ func (r *Rotary) monitor(channel *chan string) {
 				*channel <- "Counterclockwise"
 			}
 		}
-		// You might want to include debouncing logic
 	}
 }
