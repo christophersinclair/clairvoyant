@@ -1,6 +1,6 @@
 module clairvoyant
 
-go 1.22.1
+go 1.22
 
 require (
 	github.com/bgould/tinygo-rotary-encoder v0.0.0-20231106003644-94bb14d88946 // indirect

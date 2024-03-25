@@ -5,14 +5,14 @@ func main() {
 	display := initializeDisplay()
 
 	// Initialize four player buttons and one power button
-	redButton := initializeButton("red", "GPIO17")
-	blueButton := initializeButton("blue", "GPIO27")
-	yellowButton := initializeButton("yellow", "GPIO22")
-	greenButton := initializeButton("green", "GPIO23")
-	blackButton := initializeButton("black", "GPIO24")
+	redButton := initializeButton("red", RED_BUTTON_GPIO)
+	blueButton := initializeButton("blue", BLUE_BUTTON_GPIO)
+	yellowButton := initializeButton("yellow", YELLOW_BUTTON_GPIO)
+	greenButton := initializeButton("green", GREEN_BUTTON_GPIO)
+	blackButton := initializeButton("black", BLACK_BUTTON_GPIO)
 
 	// Initialize rotary encoder
-	rotaryEncoder := initializeRotary("GPIO16", "GPIO20", "GPIO21")
+	rotaryEncoder := initializeRotary(ROTARY_SW_GPIO, ROTARY_CLK_GPIO, ROTARY_DT_GPIO)
 
 	// Create channel for hardware events
 	redButtonEventChannel := make(chan string)

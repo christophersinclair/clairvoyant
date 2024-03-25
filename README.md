@@ -2,7 +2,7 @@
 Clairvoyant is a seemingly simple game of memory.
 
 ### Audience
-3+ players ages 5 and up.
+3 - 5 players ages 5 and up.
 
 ### Game Flow
 Player 1 starts with the crystal ball and makes a guess as to which player (could also be themselves) will be holding the ball in some number of turns later. Player 1 enters the guess into the crystal ball, and hands it off to another player of their choosing, who also makes a guess.
