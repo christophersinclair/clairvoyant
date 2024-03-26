@@ -36,6 +36,6 @@ func initializeDisplay() *Display {
 	return &display
 }
 
-func (d *Display) show(bytes []byte) {
-	d.dev.Write(bytes)
+func (d *Display) show(message string) {
+	d.dev.Write([]byte(message))
 }

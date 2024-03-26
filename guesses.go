@@ -21,7 +21,7 @@ main:
 	for {
 		turn += 1
 
-		display.dev.Write([]byte("Hello! Which player are YOU? (Please press your colored button!)"))
+		display.show("Hello! Which player are YOU? (Please press your colored button!)")
 
 		// Select holding player
 		g := ""
@@ -43,16 +43,16 @@ main:
 
 				if gu.turnItWillBe == turn && gu.target == g {
 					// Game end
-					display.dev.Write([]byte("CONGRATULATIONS TO PLAYER " + gu.guesser + "! They guessed that player " + gu.target + " would have the crystal ball in " + strconv.Itoa(gu.turnsToGo) + ", " + strconv.Itoa(gu.turnsToGo) + " turns ago!"))
+					display.show("CONGRATULATIONS TO PLAYER " + gu.guesser + "! They guessed that player " + gu.target + " would have the crystal ball in " + strconv.Itoa(gu.turnsToGo) + ", " + strconv.Itoa(gu.turnsToGo) + " turns ago!")
 
 					time.Sleep(20 * time.Second)
-					display.dev.Write([]byte("GAME OVER. THANKS FOR PLAYING!"))
+					display.show("GAME OVER. THANKS FOR PLAYING!")
 					break main
 				}
 			}
 		}
 
-		display.dev.Write([]byte("Hello " + g + "! How many turns into the future do you see? (Use the dial to select how far into the future you can look)"))
+		display.show("Hello " + g + "! How many turns into the future do you see? (Use the dial to select how far into the future you can look)")
 
 		// Select turns
 		turns := 2
@@ -63,16 +63,16 @@ main:
 				if event == "CW" {
 					// Display increment of turns
 					turns += 1
-					display.dev.Write([]byte(strconv.Itoa(turns)))
+					display.show(strconv.Itoa(turns))
 				}
 
 				if event == "CCW" {
 					// Display decrement of turns
 					if turns != 2 {
 						turns -= 1
-						display.dev.Write([]byte(strconv.Itoa(turns)))
+						display.show(strconv.Itoa(turns))
 					} else {
-						display.dev.Write([]byte(strconv.Itoa(2)))
+						display.show(strconv.Itoa(2))
 					}
 				}
 
@@ -83,7 +83,7 @@ main:
 			}
 		}
 
-		display.dev.Write([]byte("Now, who do you want to target? (Press the colored button matching the player you think will have it in " + strconv.Itoa(turns) + " turns!)"))
+		display.show("Now, who do you want to target? (Press the colored button matching the player you think will have it in " + strconv.Itoa(turns) + " turns!)")
 
 		// Select target player
 		target := ""
