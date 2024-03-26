@@ -1,66 +1,91 @@
 package main
 
+import (
+	"math/rand"
+	"strconv"
+)
+
 func main() {
+start:
+	GAME_START := false
+	NUM_PLAYERS := 0
+
+	hardwareEventChannel := make(chan string)
+	setupInput(&hardwareEventChannel)
+
 	// Initialize display driver
 	display := initializeDisplay()
 
-	// Initialize four player buttons and one power button
-	redButton := initializeButton("red", RED_BUTTON_GPIO)
-	blueButton := initializeButton("blue", BLUE_BUTTON_GPIO)
-	yellowButton := initializeButton("yellow", YELLOW_BUTTON_GPIO)
-	greenButton := initializeButton("green", GREEN_BUTTON_GPIO)
-	blackButton := initializeButton("black", BLACK_BUTTON_GPIO)
+	// Start game with welcome message
+	welcomeMessage := "Welcome to Clairvoyant. Please press the knob to get started."
+	welcomeMessageBytes := []byte(welcomeMessage)
+	display.dev.Write(welcomeMessageBytes)
 
-	// Initialize rotary encoder
-	rotaryEncoder := initializeRotary(ROTARY_SW_GPIO, ROTARY_CLK_GPIO, ROTARY_DT_GPIO)
-
-	// Create channel for hardware events
-	redButtonEventChannel := make(chan string)
-	blueButtonEventChannel := make(chan string)
-	yellowButtonEventChannel := make(chan string)
-	greenButtonEventChannel := make(chan string)
-	blackButtonEventChannel := make(chan string)
-
-	rotaryEncoderEventChannel := make(chan string)
-
-	// Kick off monitoring goroutines
-	go redButton.monitor(&redButtonEventChannel)
-	go blueButton.monitor(&blackButtonEventChannel)
-	go yellowButton.monitor(&yellowButtonEventChannel)
-	go greenButton.monitor(&greenButtonEventChannel)
-	go blackButton.monitor(&blackButtonEventChannel)
-
-	go rotaryEncoder.monitor(&rotaryEncoderEventChannel)
-
+knob:
 	for {
 		select {
-		case event := <-redButtonEventChannel:
-			if event == "High" {
-				// Red button was pressed
-			}
-		case event := <-blueButtonEventChannel:
-			if event == "High" {
-				// Blue button was pressed
-			}
-		case event := <-yellowButtonEventChannel:
-			if event == "High" {
-				// Yellow button was pressed
-			}
-		case event := <-greenButtonEventChannel:
-			if event == "High" {
-				// Green button was pressed
-			}
-		case event := <-blackButtonEventChannel:
-			if event == "High" {
-				// Black button was pressed
-			}
-		case event := <-rotaryEncoderEventChannel:
-			if event == "CW" {
-				// Rotary encoder was turned clockwise
-				display.show(make([]byte, 0))
-			} else if event == "CCW" {
-				// Rotary encoder was turned counterclockwise
+		case event := <-hardwareEventChannel:
+			if event == "KNOB" {
+				GAME_START = true
+				break knob
 			}
 		}
+	}
+
+	// Retrieve input on number of players and display
+	if GAME_START {
+		display.dev.Write([]byte(strconv.Itoa(NUM_PLAYERS)))
+
+		// Detect and display counter based on rotations of the rotary encoder
+	rot:
+		for {
+			select {
+			case event := <-hardwareEventChannel:
+				if event == "CW" {
+					// Display increment of player count
+					NUM_PLAYERS += 1
+					display.dev.Write([]byte(strconv.Itoa(NUM_PLAYERS)))
+				}
+
+				if event == "CCW" {
+					// Display decrement of player count
+					if NUM_PLAYERS != 0 {
+						NUM_PLAYERS -= 1
+						display.dev.Write([]byte(strconv.Itoa(NUM_PLAYERS)))
+					} else {
+						display.dev.Write([]byte(strconv.Itoa(0)))
+					}
+				}
+
+				if event == "KNOB" {
+					// Set player count and continue
+					break rot
+				}
+			}
+		}
+
+		// Randomly select a player to start
+		firstPlayer := ""
+
+		randInt := rand.Intn(NUM_PLAYERS)
+		switch randInt {
+		case 0:
+			firstPlayer = "RED"
+		case 1:
+			firstPlayer = "BLUE"
+		case 2:
+			firstPlayer = "GREEN"
+		case 3:
+			firstPlayer = "YELLOW"
+		case 4:
+			firstPlayer = "BLACK"
+		}
+
+		display.dev.Write([]byte(firstPlayer + " goes first! Hand the crystal ball to them!"))
+
+		guessLoop(&hardwareEventChannel, display)
+
+		goto start
+
 	}
 }

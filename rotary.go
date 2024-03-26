@@ -51,11 +51,20 @@ func initializeRotary(swPin string, aPin string, bPin string) *Rotary {
 func (r *Rotary) monitor(channel *chan string) {
 	pinA := r.clk
 	pinB := r.dt
+	pinSW := r.sw
 
-	pinA.In(gpio.PullUp, gpio.BothEdges) // default state for both pins is high, so pull up
-	pinB.In(gpio.PullUp, gpio.BothEdges) // default state for both pins is high, so pull up
+	pinA.In(gpio.PullUp, gpio.BothEdges)  // default state for CLK pin is high, so pull up
+	pinB.In(gpio.PullUp, gpio.BothEdges)  // default state for DT pin is high, so pull up
+	pinSW.In(gpio.PullUp, gpio.BothEdges) // default state for SW pin is high, so pull up
 
 	for {
+		if pinSW.WaitForEdge(time.Second) {
+			fmt.Println("Detected knob press")
+
+			stateSW := pinSW.Read()
+			*channel <- stateSW.String()
+		}
+
 		if pinA.WaitForEdge(time.Second) {
 			fmt.Println("Detected rotation")
 
