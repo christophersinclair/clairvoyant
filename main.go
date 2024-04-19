@@ -5,10 +5,39 @@ import (
 	"strconv"
 )
 
-func main() {
-start:
-	GAME_START := false
+func waitForPlayerSelection(hardwareEventChannel *chan string, display *Display) int {
 	NUM_PLAYERS := 0
+	display.show(strconv.Itoa(NUM_PLAYERS))
+
+	for {
+		select {
+		case event := <-*hardwareEventChannel:
+			if event == "CW" {
+				// Display increment of player count
+				NUM_PLAYERS += 1
+				display.show(strconv.Itoa(NUM_PLAYERS))
+			}
+
+			if event == "CCW" {
+				// Display decrement of player count
+				if NUM_PLAYERS != 0 {
+					NUM_PLAYERS -= 1
+					display.show(strconv.Itoa(NUM_PLAYERS))
+				} else {
+					display.show(strconv.Itoa(0))
+				}
+			}
+
+			if event == "KNOB" {
+				// Set player count and continue
+				return NUM_PLAYERS
+			}
+		}
+	}
+}
+
+func main() {
+	GAME_START := false
 
 	hardwareEventChannel := make(chan string)
 	setupInput(&hardwareEventChannel)
@@ -20,48 +49,20 @@ start:
 	welcomeMessage := "Welcome to Clairvoyant. Please press the knob to get started."
 	display.show(welcomeMessage)
 
-knob:
 	for {
 		select {
 		case event := <-hardwareEventChannel:
 			if event == "KNOB" {
 				GAME_START = true
-				break knob
+				break
 			}
 		}
 	}
 
 	// Retrieve input on number of players and display
 	if GAME_START {
-		display.show(strconv.Itoa(NUM_PLAYERS))
-
 		// Detect and display counter based on rotations of the rotary encoder
-	rot:
-		for {
-			select {
-			case event := <-hardwareEventChannel:
-				if event == "CW" {
-					// Display increment of player count
-					NUM_PLAYERS += 1
-					display.show(strconv.Itoa(NUM_PLAYERS))
-				}
-
-				if event == "CCW" {
-					// Display decrement of player count
-					if NUM_PLAYERS != 0 {
-						NUM_PLAYERS -= 1
-						display.show(strconv.Itoa(NUM_PLAYERS))
-					} else {
-						display.show(strconv.Itoa(0))
-					}
-				}
-
-				if event == "KNOB" {
-					// Set player count and continue
-					break rot
-				}
-			}
-		}
+		NUM_PLAYERS := waitForPlayerSelection(&hardwareEventChannel, display)
 
 		// Randomly select a player to start
 		firstPlayer := ""
@@ -83,8 +84,5 @@ knob:
 		display.show(firstPlayer + " goes first! Hand the crystal ball to them!")
 
 		guessLoop(&hardwareEventChannel, display)
-
-		goto start
-
 	}
 }
